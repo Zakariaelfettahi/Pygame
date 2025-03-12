@@ -20,7 +20,7 @@ pip install pygame
 ### Clone the Repository
 ```bash
 git clone <repository-url>
-cd dungeon-crawler-game
+cd Pygame
 ```
 
 ### Run the Game
