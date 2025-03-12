@@ -1,3 +1,4 @@
+
 FPS = 60
 SCALER = 3
 SCREEN_WIDTH = 800
@@ -10,4 +11,5 @@ WEAPON_SCALER = 1.5
 
 RED = (255,0,0)
 BG = (40,25,25)
+
 

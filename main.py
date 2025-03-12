@@ -44,6 +44,21 @@ for mob in mob_types:
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
 
+#Damage text class
+font = pygame.font.Font("assets/fonts/AtariClassic.ttf", 20)
+class DamageText(pygame.sprite.Sprite):
+    def __init__(self, x, y, damage, color):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = font.render(damage, True, color)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
+    def update(self):
+        self.rect.y -= 1
+        self.counter += 1
+        if self.counter > 30:
+            self.kill()
+
 
 # create a player
 player = Character(100, 100, 100, mob_animations,0)
@@ -55,7 +70,9 @@ enemy = Character(200, 200, 100, mob_animations, 1)
 bow = Weapon(bow_image, arrow_image)
 
 #create sprite group
+damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
+
 
 #create enemy list
 enemy_list = []
@@ -99,14 +116,16 @@ while running:
     if arrow:
         arrow_group.add(arrow)
     
-    #update arrow
+    # Update arrow
     for arrow in arrow_group:
-        arrow.update(enemy_list)
+        damage, damage_position = arrow.update(enemy_list)
+        if damage:
+            damage_text = DamageText(damage_position[0], damage_position[1], str(damage), pygame.Color("red"))
+            damage_text_group.add(damage_text)
 
-    
-    #verifying if arrow gets deleted when it leaves the screen
-    print(arrow_group)
-
+    # Update and draw damage text
+    damage_text_group.update()
+    damage_text_group.draw(screen)  
 
     #draw player
     player.draw(screen)
@@ -121,6 +140,7 @@ while running:
     #draw arrow
     for arrow in arrow_group:
         arrow.draw(screen)
+
 
     #event handler (pressing keys, quiting the game)
     for event in pygame.event.get():

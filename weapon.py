@@ -59,6 +59,10 @@ class Arrow(pygame.sprite.Sprite):
         
     #update function
     def update(self, enemy_list):
+        # reset varibales
+        damage = 0
+        damage_position = (0,0)
+
         #move arrow
         self.rect.x += self.dx
         self.rect.y += self.dy
@@ -70,9 +74,12 @@ class Arrow(pygame.sprite.Sprite):
         #check for collision with enemy
         for enemy in enemy_list:
             if pygame.sprite.collide_rect(self, enemy) and enemy.alive:
-                enemy.health -= 15 + random.randint(-5,5)
+                damage = 15 + random.randint(-5,5)
+                damage_position = (enemy.rect.centerx, enemy.rect.y)
+                enemy.health -= damage
                 self.kill()
                 break
+        return damage, damage_position
 
 
     #draw function
