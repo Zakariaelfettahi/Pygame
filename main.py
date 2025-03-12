@@ -19,21 +19,27 @@ move_down = False
 def scale_image(image, scaler):
     return pygame.transform.scale(image, (image.get_width()*scaler, image.get_height()*scaler))
 
+#MOB images
+mob_animations = []
+mob_types = ['elf', 'imp', 'goblin', 'skeleton', 'muddy', "tiny_zombie", "big_demon"]
+
 #player image
 animation_types = ['idle', 'run']
-animation_list = []
 
-for animation in animation_types:
-    temp_list = []
-    for i in range(4):
-        player_image = pygame.image.load(f"assets/images/characters/elf/{animation}/{i}.png").convert_alpha()
-        player_image = scale_image(player_image, constants.SCALER)
-        temp_list.append(player_image)
+for mob in mob_types:
+    animation_list = []
+    for animation in animation_types:
+        temp_list = []
+        for i in range(4):
+            player_image = pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha()
+            player_image = scale_image(player_image, constants.SCALER)
+            temp_list.append(player_image)
+        animation_list.append(temp_list)
+    mob_animations.append(animation_list)
 
-    animation_list.append(temp_list)
 
 # create a player
-player = Character(100, 100, animation_list)
+player = Character(100, 100, mob_animations,2)
 
 
 #main game loop
