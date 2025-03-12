@@ -1,6 +1,8 @@
 import pygame
 import constants
 from character import Character
+from weapon import Weapon
+
 pygame.init()
 
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
@@ -18,6 +20,10 @@ move_down = False
 #scale image helper function
 def scale_image(image, scaler):
     return pygame.transform.scale(image, (image.get_width()*scaler, image.get_height()*scaler))
+
+#weapon images
+bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), constants.WEAPON_SCALER)
+
 
 #MOB images
 mob_animations = []
@@ -39,7 +45,10 @@ for mob in mob_types:
 
 
 # create a player
-player = Character(100, 100, mob_animations,2)
+player = Character(100, 100, mob_animations,0)
+
+#create player's weapon
+bow = Weapon(bow_image)
 
 
 #main game loop
@@ -70,8 +79,16 @@ while running:
     #update player 
     player.update()
 
+    #update weapon
+    bow.update(player)
+
     #draw player
     player.draw(screen)
+
+    #draw weapon
+    bow.draw(screen)
+
+    #event handler (pressing keys, quiting the game)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False

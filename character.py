@@ -54,5 +54,9 @@ class Character():
 
     def draw(self,area):
         flipped_image = pygame.transform.flip(self.image, self.flip, False)
-        area.blit(flipped_image, self.rect)
+        if self.char_type == 0:
+            area.blit(flipped_image, (self.rect.x, self.rect.y - constants.OFFSET*constants.SCALER))
+        else:
+            area.blit(flipped_image, self.rect)
         pygame.draw.rect(area, constants.RED , self.rect, 1)
+
