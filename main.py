@@ -12,6 +12,9 @@ pygame.display.set_caption("Dungeon Crawler")
 
 #create a clock
 clock = pygame.time.Clock()
+ 
+#define level variable
+level = constants.LEVEL
 
 #define movement variables
 move_left = False

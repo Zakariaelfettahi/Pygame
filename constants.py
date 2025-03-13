@@ -1,3 +1,5 @@
+import csv
+
 FPS = 60
 SCALER = 3
 SCREEN_WIDTH = 800
@@ -11,14 +13,23 @@ POTION_SCALER = 2
 TOP_PANNEL = (50,50,50)
 TILE_SIZE = 16 * ITEM_SCALER #fixeed this
 TILE_RANGE = 18
-MAP = [
-[7, 7, 7, 7, 7, 7],
-[7, 0, 1, 2, 3, 7],
-[7, 3, 4, 5, 5, 7],
-[7, 6, 6, 6, 6, 7],
-[7, 0, 0, 0, 0, 7],
-[7, 7, 7, 0, 7, 7],
-]
+ROWS = 150
+COLS = 150
+LEVEL = 1
+
+MAP = []
+for row in range(ROWS):
+    r = [-1] * COLS
+    MAP.append(r)
+
+with open(f"levels/level{LEVEL}_data.csv", newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            MAP[x][y] = int(tile)
+
+            
+
 
 
 RED = (255,0,0)
