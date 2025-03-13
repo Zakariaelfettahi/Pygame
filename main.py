@@ -104,6 +104,8 @@ def draw_info():
         else:
             screen.blit(empty_heart_image, (10+i*50, 0))
 
+    #draw level
+    draw_text("LEVEL: "+ str(level), font, constants.WHITE, constants.SCREEN_WIDTH/2-50 , 10)
     #draw coins
     draw_text(f"Shmoney:{player.coins}", font, constants.WHITE, 600, 10)
 
