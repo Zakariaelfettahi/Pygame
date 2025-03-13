@@ -60,10 +60,17 @@ for mob in mob_types:
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
 
+# draw background
+    def draw_bg():
+        for x in range(30):
+            pygame.draw.line(screen, constants.WHITE, (x*40, 0), (x*40, constants.SCREEN_HEIGHT))
+            pygame.draw.line(screen, constants.WHITE, (0, x*40), (constants.SCREEN_WIDTH, x*40))
+
 #Write on screen
 def draw_text(text, font, text_color, x, y):
     img = font.render(text, True, text_color)
     screen.blit(img, (x, y))
+
 #draw info function
 def draw_info():
     #draw pannel
@@ -140,6 +147,9 @@ while running:
 
     screen.fill(constants.BG)
 
+    #draw background grid
+    draw_bg()
+
     #calculate movement
     dx=0
     dy=0
@@ -175,11 +185,11 @@ while running:
             damage_text = DamageText(damage_position[0], damage_position[1], str(damage), pygame.Color("red"))
             damage_text_group.add(damage_text)
 
-    # Update and draw damage text
+    # Update and draw damage text (NOT THIS)
     damage_text_group.update()
     damage_text_group.draw(screen)  
 
-    #draw and update itmes 
+    #draw and update items (NOT THIS)
     item_group.draw(screen)
     item_group.update(player)
 
