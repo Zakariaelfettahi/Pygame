@@ -21,6 +21,11 @@ move_down = False
 def scale_image(image, scaler):
     return pygame.transform.scale(image, (image.get_width()*scaler, image.get_height()*scaler))
 
+#heart images
+empty_heart_image = scale_image(pygame.image.load("assets/images/items/heart_empty.png").convert_alpha(), constants.ITEM_SCALER)
+half_heart_image = scale_image(pygame.image.load("assets/images/items/heart_half.png").convert_alpha(), constants.ITEM_SCALER)
+full_heart_image = scale_image(pygame.image.load("assets/images/items/heart_full.png").convert_alpha(), constants.ITEM_SCALER)
+
 #weapon images
 bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), constants.WEAPON_SCALER)
 arrow_image = scale_image(pygame.image.load("assets/images/weapons/arrow.png").convert_alpha(), constants.WEAPON_SCALER)
@@ -43,6 +48,23 @@ for mob in mob_types:
             temp_list.append(player_image)
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
+
+#draw info function
+def draw_info():
+    #draw pannel
+    pygame.draw.rect(screen, constants.TOP_PANNEL, (0,0,constants.SCREEN_WIDTH, 40))
+    pygame.draw.line(screen, constants.WHITE, (0,40), (constants.SCREEN_WIDTH, 40), 1)
+    #draw health
+    half_heart_drawn = False
+    for i in range(5):
+        if player.health >= ((i+1)*20):
+            screen.blit(full_heart_image, (10+i*50, 0))
+        elif (player.health % 20 > 0) and half_heart_drawn == False:
+            screen.blit(half_heart_image, (10+i*50, 0))
+            half_heart_drawn = True
+        else:
+            screen.blit(empty_heart_image, (10+i*50, 0))
+
 
 #Damage text class
 font = pygame.font.Font("assets/fonts/AtariClassic.ttf", 20)
@@ -126,6 +148,9 @@ while running:
     # Update and draw damage text
     damage_text_group.update()
     damage_text_group.draw(screen)  
+
+    #draw info
+    draw_info()
 
     #draw player
     player.draw(screen)
