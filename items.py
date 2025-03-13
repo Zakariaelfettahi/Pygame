@@ -1,7 +1,7 @@
 import pygame
 
 class Items(pygame.sprite.Sprite):
-    def __init__(self, x, y, item_type, animation_list):
+    def __init__(self, x, y, item_type, animation_list, dummy_coin = False):
         pygame.sprite.Sprite.__init__(self)
         self.item_type = item_type
         self.animation_list = animation_list
@@ -10,8 +10,15 @@ class Items(pygame.sprite.Sprite):
         self.image = self.animation_list[self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+        self.dummy_coin = dummy_coin
 
-    def update(self, player):
+    def update(self, screen_scroll, player):
+        #dummy coin
+        if not self.dummy_coin:
+            #update rect
+            self.rect.x += screen_scroll[0]
+            self.rect.y += screen_scroll[1]
+
         #check collision with player
         if pygame.sprite.collide_rect(self, player):
             #check item type
@@ -34,6 +41,7 @@ class Items(pygame.sprite.Sprite):
         if self.frame_index >= len(self.animation_list):
             self.frame_index = 0
 
+        
     def draw(self, area):
         area.blit(self.image, self.rect)
 

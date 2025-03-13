@@ -19,6 +19,9 @@ class Character():
         self.coins = 0
     
     def move(self,dx,dy):
+        #screen scroll
+        screen_scroll = [0,0]
+
         #flip image if going left
         if dx < 0:
             self.flip = True
@@ -36,6 +39,37 @@ class Character():
         self.running = True
         if dx == 0 and dy == 0:
             self.running = False
+
+        #update player scroll based on player position
+        if self.char_type == 0:
+
+            #scroll right
+            if self.rect.right > constants.SCREEN_WIDTH - constants.SCROLL_THRESH:
+                screen_scroll[0] = (constants.SCREEN_WIDTH - constants.SCROLL_THRESH) - self.rect.right
+                self.rect.right = constants.SCREEN_WIDTH - constants.SCROLL_THRESH
+
+            #scroll left
+            if self.rect.left < constants.SCROLL_THRESH:
+                screen_scroll[0] = constants.SCROLL_THRESH - self.rect.left
+                self.rect.left = constants.SCROLL_THRESH
+            
+            #scroll down
+            if self.rect.bottom > constants.SCREEN_HEIGHT - constants.SCROLL_THRESH:
+                screen_scroll[1] = (constants.SCREEN_HEIGHT - constants.SCROLL_THRESH) - self.rect.bottom
+                self.rect.bottom = constants.SCREEN_HEIGHT - constants.SCROLL_THRESH
+
+            #scroll up
+            if self.rect.top < constants.SCROLL_THRESH:
+                screen_scroll[1] = constants.SCROLL_THRESH - self.rect.top
+                self.rect.top = constants.SCROLL_THRESH
+
+        return screen_scroll
+            
+    def ai(self, screen_scroll):
+        #reposition mob
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+
 
     def update(self):
         #check if character is alive

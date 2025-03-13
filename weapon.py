@@ -58,14 +58,14 @@ class Arrow(pygame.sprite.Sprite):
         self.dy = -(math.sin(math.radians(self.angle)) * constants.ARROW_SPEED)
         
     #update function
-    def update(self, enemy_list):
+    def update(self, screen_scroll, enemy_list ):
         # reset varibales
         damage = 0
         damage_position = (0,0)
 
         #move arrow
-        self.rect.x += self.dx
-        self.rect.y += self.dy
+        self.rect.x += screen_scroll[0] + self.dx
+        self.rect.y += screen_scroll[1] + self.dy
 
         #delete arrow if it leaves the screen
         if self.rect.right < 0 or self.rect.left > constants.SCREEN_WIDTH or self.rect.bottom < 0 or self.rect.top > constants.SCREEN_HEIGHT:

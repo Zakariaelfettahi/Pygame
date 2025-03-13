@@ -16,6 +16,9 @@ clock = pygame.time.Clock()
 #define level variable
 level = constants.LEVEL
 
+#define screen scroll 
+screen_scroll = [0,0]
+
 #define movement variables
 move_left = False
 move_right = False
@@ -102,7 +105,7 @@ def draw_info():
             screen.blit(empty_heart_image, (10+i*50, 0))
 
     #draw coins
-    draw_text(f"Shmoney: {player.coins}", font, constants.WHITE, 600, 10)
+    draw_text(f"Shmoney:{player.coins}", font, constants.WHITE, 600, 10)
 
 #Damage text class
 font = pygame.font.Font("assets/fonts/AtariClassic.ttf", 20)
@@ -114,6 +117,12 @@ class DamageText(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.counter = 0
     def update(self):
+
+        #screen scroll
+        self.rect.x += screen_scroll[0]
+        self.rect.y += screen_scroll[1]
+
+        #move damage up
         self.rect.y -= 1
         self.counter += 1
         if self.counter > 30:
@@ -135,7 +144,7 @@ arrow_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
 
 #create top pannel coin
-score_coin = Items(590, 19, 0, coin_images)
+score_coin = Items(590, 19, 0, coin_images, True)
 item_group.add(score_coin)
 
 #create coin
@@ -143,7 +152,7 @@ coin = Items(300, 300, 0, coin_images)
 item_group.add(coin)
 
 #create potion
-potion = Items(100, 200, 1, [potion_image])
+potion = Items(100, 200, 1, [potion_image]) #no need for fifth argument, init as false by defaut in items.py
 item_group.add(potion)
 
 
@@ -164,9 +173,6 @@ while running:
     #draw world
     world.draw(screen)
 
-    #draw grid  
-    draw_bg()  #fixed this
-
     #calculate movement
     dx=0
     dy=0
@@ -181,13 +187,17 @@ while running:
         dx = +constants.SPEED
 
     #move player
-    player.move(dx,dy)
+    screen_scroll = player.move(dx,dy)
+
+    #update world
+    world.update(screen_scroll)
 
     #update player 
     player.update()
 
     #update enemy
     for enemy in enemy_list:
+        enemy.ai(screen_scroll)
         enemy.update()
 
     #update weapon
@@ -197,7 +207,7 @@ while running:
     
     # Update arrow
     for arrow in arrow_group:
-        damage, damage_position = arrow.update(enemy_list)
+        damage, damage_position = arrow.update(screen_scroll, enemy_list)
         if damage:
             damage_text = DamageText(damage_position[0], damage_position[1], str(damage), pygame.Color("red"))
             damage_text_group.add(damage_text)
@@ -208,7 +218,7 @@ while running:
 
     #draw and update items (NOT THIS)
     item_group.draw(screen)
-    item_group.update(player)
+    item_group.update(screen_scroll, player)
 
     #draw info
     draw_info()
