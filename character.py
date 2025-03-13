@@ -15,6 +15,7 @@ class Character():
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = pygame.Rect(0,0,40,40)
         self.rect.center = (x, y)
+        self.coins = 0
     
     def move(self,dx,dy):
         #flip image if going left
@@ -45,7 +46,7 @@ class Character():
             self.update_action(1)
         else:
             self.update_action(0)
-            
+
         animation_cooldown = 70
         self.image = self.animation_list[self.action][self.frame_index]
         if pygame.time.get_ticks() - self.update_time > animation_cooldown:

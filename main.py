@@ -2,6 +2,7 @@ import pygame
 import constants
 from character import Character
 from weapon import Weapon
+from items import Items
 
 pygame.init()
 
@@ -20,6 +21,16 @@ move_down = False
 #scale image helper function
 def scale_image(image, scaler):
     return pygame.transform.scale(image, (image.get_width()*scaler, image.get_height()*scaler))
+
+#coin images
+coin_images = []
+for i in range(4):
+    coin_image = scale_image(pygame.image.load(f"assets/images/items/coin_f{i}.png").convert_alpha(), constants.ITEM_SCALER)
+    coin_images.append(coin_image)
+
+#potion image
+potion_image = scale_image(pygame.image.load("assets/images/items/potion_red.png").convert_alpha(), constants.POTION_SCALER)
+
 
 #heart images
 empty_heart_image = scale_image(pygame.image.load("assets/images/items/heart_empty.png").convert_alpha(), constants.ITEM_SCALER)
@@ -49,6 +60,10 @@ for mob in mob_types:
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
 
+#Write on screen
+def draw_text(text, font, text_color, x, y):
+    img = font.render(text, True, text_color)
+    screen.blit(img, (x, y))
 #draw info function
 def draw_info():
     #draw pannel
@@ -65,6 +80,8 @@ def draw_info():
         else:
             screen.blit(empty_heart_image, (10+i*50, 0))
 
+    #draw coins
+    draw_text(f"Shmoney: {player.coins}", font, constants.WHITE, 600, 10)
 
 #Damage text class
 font = pygame.font.Font("assets/fonts/AtariClassic.ttf", 20)
@@ -94,6 +111,19 @@ bow = Weapon(bow_image, arrow_image)
 #create sprite group
 damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
+item_group = pygame.sprite.Group()
+
+#create top pannel coin
+score_coin = Items(590, 19, 0, coin_images)
+item_group.add(score_coin)
+
+#create coin
+coin = Items(300, 300, 0, coin_images)
+item_group.add(coin)
+
+#create potion
+potion = Items(100, 200, 1, [potion_image])
+item_group.add(potion)
 
 
 #create enemy list
@@ -149,8 +179,15 @@ while running:
     damage_text_group.update()
     damage_text_group.draw(screen)  
 
+    #draw and update itmes 
+    item_group.draw(screen)
+    item_group.update(player)
+
     #draw info
     draw_info()
+
+    #draw score_coin 
+    score_coin.draw(screen)
 
     #draw player
     player.draw(screen)
