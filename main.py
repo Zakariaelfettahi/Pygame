@@ -3,6 +3,7 @@ import constants
 from character import Character
 from weapon import Weapon
 from items import Items
+from world import World
 
 pygame.init()
 
@@ -21,6 +22,13 @@ move_down = False
 #scale image helper function
 def scale_image(image, scaler):
     return pygame.transform.scale(image, (image.get_width()*scaler, image.get_height()*scaler))
+
+#tile images
+tile_list = []
+for i in range(constants.TILE_RANGE):
+    tile_image = pygame.image.load(f"assets/images/tiles/{i}.png").convert_alpha()
+    tile_image = pygame.transform.scale(tile_image, (constants.TILE_SIZE, constants.TILE_SIZE)) #pyygame.transform not scale(load)
+    tile_list.append(tile_image)
 
 #coin images
 coin_images = []
@@ -60,11 +68,14 @@ for mob in mob_types:
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
 
-# draw background
-    def draw_bg():
-        for x in range(30):
-            pygame.draw.line(screen, constants.WHITE, (x*40, 0), (x*40, constants.SCREEN_HEIGHT))
-            pygame.draw.line(screen, constants.WHITE, (0, x*40), (constants.SCREEN_WIDTH, x*40))
+#draw world
+world = World()
+world.process_data(constants.MAP, tile_list)
+# draw grid
+def draw_bg():
+    for x in range(30):
+        pygame.draw.line(screen, constants.WHITE, (x*constants.TILE_SIZE, 0), (x*constants.TILE_SIZE, constants.SCREEN_HEIGHT))
+        pygame.draw.line(screen, constants.WHITE, (0, x*constants.TILE_SIZE), (constants.SCREEN_WIDTH, x*constants.TILE_SIZE))
 
 #Write on screen
 def draw_text(text, font, text_color, x, y):
@@ -147,8 +158,11 @@ while running:
 
     screen.fill(constants.BG)
 
-    #draw background grid
-    draw_bg()
+    #draw world
+    world.draw(screen)
+
+    #draw grid  
+    draw_bg()  #fixed this
 
     #calculate movement
     dx=0

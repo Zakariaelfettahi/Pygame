@@ -9,6 +9,17 @@ WEAPON_SCALER = 1.5
 ITEM_SCALER = 2.5
 POTION_SCALER = 2
 TOP_PANNEL = (50,50,50)
+TILE_SIZE = 16 * ITEM_SCALER #fixeed this
+TILE_RANGE = 18
+MAP = [
+[7, 7, 7, 7, 7, 7],
+[7, 0, 1, 2, 3, 7],
+[7, 3, 4, 5, 5, 7],
+[7, 6, 6, 6, 6, 7],
+[7, 0, 0, 0, 0, 7],
+[7, 7, 7, 0, 7, 7],
+]
+
 
 RED = (255,0,0)
 WHITE = (255,255,255)
