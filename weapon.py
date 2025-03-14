@@ -58,7 +58,7 @@ class Arrow(pygame.sprite.Sprite):
         self.dy = -(math.sin(math.radians(self.angle)) * constants.ARROW_SPEED)
         
     #update function
-    def update(self, screen_scroll, enemy_list ):
+    def update(self, screen_scroll, obstacle_tiles, enemy_list ):
         # reset varibales
         damage = 0
         damage_position = (0,0)
@@ -66,6 +66,11 @@ class Arrow(pygame.sprite.Sprite):
         #move arrow
         self.rect.x += screen_scroll[0] + self.dx
         self.rect.y += screen_scroll[1] + self.dy
+
+        #check for collison arrow x walls
+        for obstacle in obstacle_tiles:
+            if obstacle[1].colliderect(self.rect):
+                self.kill()
 
         #delete arrow if it leaves the screen
         if self.rect.right < 0 or self.rect.left > constants.SCREEN_WIDTH or self.rect.bottom < 0 or self.rect.top > constants.SCREEN_HEIGHT:
@@ -77,6 +82,7 @@ class Arrow(pygame.sprite.Sprite):
                 damage = 15 + random.randint(-5,5)
                 damage_position = (enemy.rect.centerx, enemy.rect.y)
                 enemy.health -= damage
+                enemy.hit = True
                 self.kill()
                 break
         return damage, damage_position

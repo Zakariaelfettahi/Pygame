@@ -201,7 +201,7 @@ while running:
 
     #update enemy
     for enemy in enemy_list:
-        enemy.ai(screen_scroll)
+        enemy.ai(player, world.obstacle_tiles, screen_scroll)
         enemy.update()
 
     #update weapon
@@ -211,7 +211,7 @@ while running:
     
     # Update arrow
     for arrow in arrow_group:
-        damage, damage_position = arrow.update(screen_scroll, enemy_list)
+        damage, damage_position = arrow.update(screen_scroll, world.obstacle_tiles, enemy_list)
         if damage:
             damage_text = DamageText(damage_position[0], damage_position[1], str(damage), pygame.Color("red"))
             damage_text_group.add(damage_text)
