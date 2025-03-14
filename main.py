@@ -155,7 +155,7 @@ class ScreenFade():
         self.fade_counter += self.speed
 
         # Ensure fade effect starts from full screen and opens outward
-        if self.fade_counter < constants.SCREEN_WIDTH // 2:
+        if self.direction == 1:
             # Left
             pygame.draw.rect(screen, self.color, (0, 0, (constants.SCREEN_WIDTH // 2) - self.fade_counter, constants.SCREEN_HEIGHT))
             # Right
@@ -164,6 +164,9 @@ class ScreenFade():
             pygame.draw.rect(screen, self.color, (0, 0, constants.SCREEN_WIDTH, (constants.SCREEN_HEIGHT // 2) - self.fade_counter))
             # Bottom
             pygame.draw.rect(screen, self.color, (0, (constants.SCREEN_HEIGHT // 2) + self.fade_counter, constants.SCREEN_WIDTH, (constants.SCREEN_HEIGHT // 2) - self.fade_counter))
+
+        elif self.direction == 2:
+            pygame.draw.rect(screen, self.color, (0, 0, constants.SCREEN_WIDTH, 0+ self.fade_counter) )
         if self.fade_counter >= constants.SCREEN_WIDTH:
             fade_complete = True  # When the screen is fully revealed
 
@@ -217,6 +220,7 @@ for item in world.item_list:
 
 #create screen fade
 intro_fade = ScreenFade(1, constants.BLACK, 4)
+death_fade = ScreenFade(2, constants.PINK, 4)
 
 
 #create coin
@@ -240,58 +244,61 @@ while running:
     #draw world
     world.draw(screen)
 
-    #calculate movement
-    dx=0
-    dy=0
+    #check game over
+    if player.alive:
 
-    if move_down:
-        dy = +constants.SPEED
-    if move_up:
-        dy = -constants.SPEED
-    if move_left:
-        dx = -constants.SPEED
-    if move_right:
-        dx = +constants.SPEED
+        #calculate movement
+        dx=0
+        dy=0
 
-    #move player
-    screen_scroll, level_complete  = player.move(dx,dy, world.obstacle_tiles, world.exit_tile)
+        if move_down:
+            dy = +constants.SPEED
+        if move_up:
+            dy = -constants.SPEED
+        if move_left:
+            dx = -constants.SPEED
+        if move_right:
+            dx = +constants.SPEED
 
-    #update world
-    world.update(screen_scroll)
+        #move player
+        screen_scroll, level_complete  = player.move(dx,dy, world.obstacle_tiles, world.exit_tile)
 
-    #update player 
-    player.update()
+        #update world
+        world.update(screen_scroll)
 
-    #update enemy
-    for enemy in enemy_list:
-        fireball = enemy.ai(player, world.obstacle_tiles, screen_scroll, fireball_image)
-        if fireball:
-            fireball_group.add(fireball)
-        if enemy.alive:
-            enemy.update()
+        #update player 
+        player.update()
 
-    #update weapon
-    arrow = bow.update(player)
-    if arrow:
-        arrow_group.add(arrow)
-    
-    # Update arrow
-    for arrow in arrow_group:
-        damage, damage_position = arrow.update(screen_scroll, world.obstacle_tiles, enemy_list)
-        if damage:
-            damage_text = DamageText(damage_position[0], damage_position[1], str(damage), pygame.Color("red"))
-            damage_text_group.add(damage_text)
+        #update enemy
+        for enemy in enemy_list:
+            fireball = enemy.ai(player, world.obstacle_tiles, screen_scroll, fireball_image)
+            if fireball:
+                fireball_group.add(fireball)
+            if enemy.alive:
+                enemy.update()
 
-    # Update and draw damage text (NOT THIS)
-    damage_text_group.update()
-    damage_text_group.draw(screen)  
+        #update weapon
+        arrow = bow.update(player)
+        if arrow:
+            arrow_group.add(arrow)
+        
+        # Update arrow
+        for arrow in arrow_group:
+            damage, damage_position = arrow.update(screen_scroll, world.obstacle_tiles, enemy_list)
+            if damage:
+                damage_text = DamageText(damage_position[0], damage_position[1], str(damage), pygame.Color("red"))
+                damage_text_group.add(damage_text)
 
-    #update fireball
-    fireball_group.update(screen_scroll, player)
+        # Update and draw damage text (NOT THIS)
+        damage_text_group.update()
+        damage_text_group.draw(screen)  
 
-    #draw and update items (NOT THIS)
-    item_group.draw(screen)
-    item_group.update(screen_scroll, player)
+        #update fireball
+        fireball_group.update(screen_scroll, player)
+
+        #draw and update items (NOT THIS)
+        item_group.draw(screen)
+        item_group.update(screen_scroll, player)
 
     #draw info
     draw_info()
@@ -350,6 +357,30 @@ while running:
         if intro_fade.fade():
             start_intro = False
             intro_fade.fade_counter = 0
+    
+    #show game over screen
+    if player.alive == False:
+        if death_fade.fade():
+            death_fade.fade_counter = 0
+            start_intro = True
+            MAP = reset_level()
+            
+            with open(f"levels/level{constants.LEVEL}_data.csv", newline='') as csvfile:
+                reader = csv.reader(csvfile, delimiter=',')
+                for x, row in enumerate(reader):
+                    for y, tile in enumerate(row):
+                        MAP[x][y] = int(tile)
+            world = World()
+            world.process_data(MAP, tile_list, item_images, mob_animations)
+
+            player = world.player
+            enemy_list = world.character_list
+            score_coin = Items(590, 19, 0, coin_images, True)
+            item_group.add(score_coin)
+
+            for item in world.item_list:
+                item_group.add(item)
+                
 
     #event handler (pressing keys, quiting the game)
     for event in pygame.event.get():
