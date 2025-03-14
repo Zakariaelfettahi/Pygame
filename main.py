@@ -4,6 +4,7 @@ from character import Character
 from weapon import Weapon
 from items import Items
 from world import World
+from button import Button
 import csv
 
 pygame.init()
@@ -31,6 +32,9 @@ move_down = False
 #scale image helper function
 def scale_image(image, scaler):
     return pygame.transform.scale(image, (image.get_width()*scaler, image.get_height()*scaler))
+
+#button images
+restart_img = scale_image(pygame.image.load(f"assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALER)
 
 #tile images
 tile_list = []
@@ -222,6 +226,9 @@ for item in world.item_list:
 intro_fade = ScreenFade(1, constants.BLACK, 4)
 death_fade = ScreenFade(2, constants.PINK, 4)
 
+#create buttons
+restart_button = Button(constants.SCREEN_WIDTH // 2 - 175, constants.SCREEN_HEIGHT // 2 -50, restart_img)
+
 
 #create coin
 coin = Items(300, 300, 0, coin_images)
@@ -361,25 +368,26 @@ while running:
     #show game over screen
     if player.alive == False:
         if death_fade.fade():
-            death_fade.fade_counter = 0
-            start_intro = True
-            MAP = reset_level()
-            
-            with open(f"levels/level{constants.LEVEL}_data.csv", newline='') as csvfile:
-                reader = csv.reader(csvfile, delimiter=',')
-                for x, row in enumerate(reader):
-                    for y, tile in enumerate(row):
-                        MAP[x][y] = int(tile)
-            world = World()
-            world.process_data(MAP, tile_list, item_images, mob_animations)
+            if restart_button.draw(screen):
+                death_fade.fade_counter = 0
+                start_intro = True
+                MAP = reset_level()
+                
+                with open(f"levels/level{constants.LEVEL}_data.csv", newline='') as csvfile:
+                    reader = csv.reader(csvfile, delimiter=',')
+                    for x, row in enumerate(reader):
+                        for y, tile in enumerate(row):
+                            MAP[x][y] = int(tile)
+                world = World()
+                world.process_data(MAP, tile_list, item_images, mob_animations)
 
-            player = world.player
-            enemy_list = world.character_list
-            score_coin = Items(590, 19, 0, coin_images, True)
-            item_group.add(score_coin)
+                player = world.player
+                enemy_list = world.character_list
+                score_coin = Items(590, 19, 0, coin_images, True)
+                item_group.add(score_coin)
 
-            for item in world.item_list:
-                item_group.add(item)
+                for item in world.item_list:
+                    item_group.add(item)
                 
 
     #event handler (pressing keys, quiting the game)
