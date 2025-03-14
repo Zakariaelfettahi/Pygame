@@ -19,7 +19,7 @@ class Character():
         self.rect.center = (x, y)
         self.coins = 0
     
-    def move(self,dx,dy):
+    def move(self,dx,dy, obstacle_tiles):
         #screen scroll
         screen_scroll = [0,0]
 
@@ -33,8 +33,24 @@ class Character():
         if dx !=0 and dy !=0:
             dx = dx/1.414
             dy = dy/1.414
+        
+        #check for collision
         self.rect.x += dx
+        for obstacle in obstacle_tiles:
+            if obstacle[1].colliderect(self.rect):
+                #check which side
+                if dx > 0:
+                    self.rect.right= obstacle[1].left
+                if dx < 0:
+                    self.rect.left= obstacle[1].right
         self.rect.y += dy
+        for obstacle in obstacle_tiles:
+            if obstacle[1].colliderect(self.rect):
+                #check which side
+                if dy > 0:
+                    self.rect.bottom = obstacle[1].top
+                if dy < 0:
+                    self.rect.top= obstacle[1].bottom
 
         # running animation
         self.running = True
