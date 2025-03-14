@@ -23,6 +23,7 @@ level = 1
 #variables buttons
 start_game = False
 pause_game = False
+won_game = False
 
 #define screen intro
 start_intro = False
@@ -257,6 +258,8 @@ for item in world.item_list:
 #create screen fade
 intro_fade = ScreenFade(1, constants.BLACK, 4)
 death_fade = ScreenFade(2, constants.PINK, 4)
+win_fade = ScreenFade(2, constants.YELLOW, 4)
+
 
 #create buttons
 restart_button = Button(constants.SCREEN_WIDTH // 2 - 175, constants.SCREEN_HEIGHT // 2 -50, restart_img)
@@ -390,31 +393,40 @@ while running:
 
             #check level completion
 
-            if level_complete and level < 3:
-                start_intro = True
-                level += 1
-                MAP = reset_level()
-                
-                with open(f"levels/level{level}_data.csv", newline='') as csvfile:
-                    reader = csv.reader(csvfile, delimiter=',')
-                    for x, row in enumerate(reader):
-                        for y, tile in enumerate(row):
-                            MAP[x][y] = int(tile)
-                world = World()
-                world.process_data(MAP, tile_list, item_images, mob_animations)
+            if level_complete:
+                if level < 3:
+                    start_intro = True
+                    level += 1
+                    MAP = reset_level()
+                    
+                    with open(f"levels/level{level}_data.csv", newline='') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=',')
+                        for x, row in enumerate(reader):
+                            for y, tile in enumerate(row):
+                                MAP[x][y] = int(tile)
+                    world = World()
+                    world.process_data(MAP, tile_list, item_images, mob_animations)
 
-                temp_hp = player.health
-                temp_xp = player.coins
+                    temp_hp = player.health
+                    temp_xp = player.coins
 
-                player = world.player
-                player.health = temp_hp
-                player.coins = temp_xp
-                enemy_list = world.character_list
-                score_coin = Items(590, 19, 0, coin_images, True)
-                item_group.add(score_coin)
+                    player = world.player
+                    player.health = temp_hp
+                    player.coins = temp_xp
+                    enemy_list = world.character_list
+                    score_coin = Items(590, 19, 0, coin_images, True)
+                    item_group.add(score_coin)
 
-                for item in world.item_list:
-                    item_group.add(item)
+                    for item in world.item_list:
+                        item_group.add(item)
+
+                else:  
+                    if win_fade.fade():  
+                        draw_text("YOU WIN!", font, constants.WHITE, constants.SCREEN_WIDTH // 2 - 50, constants.SCREEN_HEIGHT // 2)
+                        pygame.display.update()
+                        pygame.time.delay(3000)  # Pause for 3 seconds
+                        running = False  # Stop game
+
 
             #show intro
             if start_intro == True:
