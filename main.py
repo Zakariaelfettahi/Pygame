@@ -4,6 +4,7 @@ from character import Character
 from weapon import Weapon
 from items import Items
 from world import World
+import csv
 
 pygame.init()
 
@@ -14,7 +15,7 @@ pygame.display.set_caption("Dungeon Crawler")
 clock = pygame.time.Clock()
  
 #define level variable
-level = constants.LEVEL
+level = 1
 
 #define screen scroll 
 screen_scroll = [0,0]
@@ -77,10 +78,21 @@ for mob in mob_types:
             temp_list.append(player_image)
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
+#MAP
+MAP = []
+for row in range(constants.ROWS):
+    r = [-1] * constants.COLS
+    MAP.append(r)
+
+with open(f"levels/level{level}_data.csv", newline='') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            MAP[x][y] = int(tile)
 
 #draw world
 world = World()
-world.process_data(constants.MAP, tile_list, item_images, mob_animations)
+world.process_data(MAP, tile_list, item_images, mob_animations)
 # draw grid
 def draw_bg():
     for x in range(30):
@@ -112,6 +124,24 @@ def draw_info():
     draw_text("LEVEL: "+ str(level), font, constants.WHITE, constants.SCREEN_WIDTH/2-50 , 10)
     #draw coins
     draw_text(f"Shmoney:{player.coins}", font, constants.WHITE, 600, 10)
+
+#reset level
+def reset_level():
+    #clear
+    damage_text_group.empty()
+    arrow_group.empty()
+    item_group.empty()
+    fireball_group .empty()
+
+    #set
+    data = []
+    for row in range(constants.ROWS):
+        r = [-1] * constants.COLS
+        data.append(r)
+    
+    return data
+
+
 
 #Damage text class
 font = pygame.font.Font("assets/fonts/AtariClassic.ttf", 20)
@@ -193,7 +223,7 @@ while running:
         dx = +constants.SPEED
 
     #move player
-    screen_scroll = player.move(dx,dy, world.obstacle_tiles)
+    screen_scroll, level_complete  = player.move(dx,dy, world.obstacle_tiles, world.exit_tile)
 
     #update world
     world.update(screen_scroll)
@@ -255,6 +285,32 @@ while running:
     #draw fireball
     for fireball in fireball_group:
         fireball.draw(screen)
+
+    #check level completion
+    if level_complete and level < 3:
+        level += 1
+        MAP = reset_level()
+        
+        with open(f"levels/level{constants.LEVEL}_data.csv", newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for x, row in enumerate(reader):
+                for y, tile in enumerate(row):
+                    MAP[x][y] = int(tile)
+        world = World()
+        world.process_data(MAP, tile_list, item_images, mob_animations)
+
+        temp_hp = player.health
+        temp_xp = player.coins
+
+        player = world.player
+        player.health = temp_hp
+        player.coins = temp_xp
+        enemy_list = world.character_list
+        score_coin = Items(590, 19, 0, coin_images, True)
+        item_group.add(score_coin)
+
+        for item in world.item_list:
+            item_group.add(item)
 
 
     #event handler (pressing keys, quiting the game)

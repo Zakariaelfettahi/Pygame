@@ -16,7 +16,7 @@ class Character():
         self.alive = True
         self.update_time = pygame.time.get_ticks()
         self.image = self.animation_list[self.action][self.frame_index]
-        self.rect = pygame.Rect(0,0,constants.TILE_SIZE * size, constants.TILE_SIZE*size)
+        self.rect = pygame.Rect(0,0,constants.TILE_SIZE*0.90 * size, constants.TILE_SIZE*size*0.90)
         self.rect.center = (x, y)
         self.coins = 0
         self.hit = False
@@ -24,7 +24,20 @@ class Character():
         self.last_attack = pygame.time.get_ticks()
         self.stunned =  False
     
-    def move(self,dx,dy, obstacle_tiles):
+    def move(self,dx,dy, obstacle_tiles, exit_tile = None):
+        #level completion
+        level_complete = False
+
+        if self.char_type == 0:
+            if exit_tile[1].colliderect(self.rect):
+                #ensure player is the right distance
+                exit_dist = math.sqrt((self.rect.centerx - exit_tile[1].centerx)**2) + ((self.rect.centery - exit_tile[1].centery)**2)
+                if exit_dist < 20: 
+                    level_complete = True
+
+        
+
+
         #screen scroll
         screen_scroll = [0,0]
 
@@ -85,7 +98,7 @@ class Character():
                 screen_scroll[1] = constants.SCROLL_THRESH - self.rect.top
                 self.rect.top = constants.SCROLL_THRESH
 
-        return screen_scroll
+        return screen_scroll, level_complete
             
     def ai(self, player, obstacle_tiles, screen_scroll, fireball_image):
         fireball = None
