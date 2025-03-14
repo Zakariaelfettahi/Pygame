@@ -1,5 +1,6 @@
 import pygame
 import math
+import weapon
 import constants
 
 class Character():
@@ -20,6 +21,7 @@ class Character():
         self.coins = 0
         self.hit = False
         self.last_hit = pygame.time.get_ticks()
+        self.last_attack = pygame.time.get_ticks()
         self.stunned =  False
     
     def move(self,dx,dy, obstacle_tiles):
@@ -85,7 +87,8 @@ class Character():
 
         return screen_scroll
             
-    def ai(self, player, obstacle_tiles, screen_scroll):
+    def ai(self, player, obstacle_tiles, screen_scroll, fireball_image):
+        fireball = None
         clipped_line = ()
         stun_cooldown = 200
         ai_dx = 0
@@ -123,6 +126,13 @@ class Character():
                     player.health -= 10
                     player.hit = True
                     player.last_hit = pygame.time.get_ticks()
+                    #boss eenemy fireball
+                    boss_cooldown = 750
+                    if self.boss:
+                        if dist < 500:
+                            if pygame.time.get_ticks() - self.last_attack >= boss_cooldown:
+                                fireball = weapon.Fireball(fireball_image, self.rect.centerx, self.rect.centery, player.rect.centerx, player.rect.centery)
+                                self.last_attack = pygame.time.get_ticks()
             
             #reset hit
             if self.hit == True:
@@ -135,6 +145,8 @@ class Character():
             #if cooldown passed
             if (pygame.time.get_ticks() - self.last_hit > stun_cooldown):
                 self.stunned = False
+            
+        return fireball
 
     def update(self):
         #check if character is alive

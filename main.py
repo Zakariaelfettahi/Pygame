@@ -57,6 +57,7 @@ full_heart_image = scale_image(pygame.image.load("assets/images/items/heart_full
 #weapon images
 bow_image = scale_image(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), constants.WEAPON_SCALER)
 arrow_image = scale_image(pygame.image.load("assets/images/weapons/arrow.png").convert_alpha(), constants.WEAPON_SCALER)
+fireball_image = scale_image(pygame.image.load("assets/images/weapons/fireball.png").convert_alpha(), constants.FIREBALL_SCALER)
 
 
 #MOB images
@@ -147,6 +148,7 @@ bow = Weapon(bow_image, arrow_image)
 damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
 item_group = pygame.sprite.Group()
+fireball_group = pygame.sprite.Group()
 
 #create top pannel coin
 score_coin = Items(590, 19, 0, coin_images, True)
@@ -201,8 +203,11 @@ while running:
 
     #update enemy
     for enemy in enemy_list:
-        enemy.ai(player, world.obstacle_tiles, screen_scroll)
-        enemy.update()
+        fireball = enemy.ai(player, world.obstacle_tiles, screen_scroll, fireball_image)
+        if fireball:
+            fireball_group.add(fireball)
+        if enemy.alive:
+            enemy.update()
 
     #update weapon
     arrow = bow.update(player)
@@ -219,6 +224,9 @@ while running:
     # Update and draw damage text (NOT THIS)
     damage_text_group.update()
     damage_text_group.draw(screen)  
+
+    #update fireball
+    fireball_group.update(screen_scroll, player)
 
     #draw and update items (NOT THIS)
     item_group.draw(screen)
@@ -243,6 +251,10 @@ while running:
     #draw arrow
     for arrow in arrow_group:
         arrow.draw(screen)
+
+    #draw fireball
+    for fireball in fireball_group:
+        fireball.draw(screen)
 
 
     #event handler (pressing keys, quiting the game)
@@ -273,4 +285,3 @@ while running:
 pygame.quit()
 
 
-#MY CONTRIBUTIONS !!!!
