@@ -271,3 +271,6 @@ while running:
                 move_down = False
     pygame.display.update()
 pygame.quit()
+
+
+#MY CONTRIBUTIONS !!!!
