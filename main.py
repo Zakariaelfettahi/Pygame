@@ -17,6 +17,8 @@ clock = pygame.time.Clock()
 #define level variable
 level = 1
 
+#define screen intro
+start_intro = True
 #define screen scroll 
 screen_scroll = [0,0]
 
@@ -141,6 +143,32 @@ def reset_level():
     
     return data
 
+#screen fade 
+class ScreenFade():
+    def __init__(self, direction, color, speed):
+        self.direction = direction
+        self.color = color 
+        self.speed = speed
+        self.fade_counter = 0
+    def fade(self):
+        fade_complete = False
+        self.fade_counter += self.speed
+
+        # Ensure fade effect starts from full screen and opens outward
+        if self.fade_counter < constants.SCREEN_WIDTH // 2:
+            # Left
+            pygame.draw.rect(screen, self.color, (0, 0, (constants.SCREEN_WIDTH // 2) - self.fade_counter, constants.SCREEN_HEIGHT))
+            # Right
+            pygame.draw.rect(screen, self.color, ((constants.SCREEN_WIDTH // 2) + self.fade_counter, 0, (constants.SCREEN_WIDTH // 2) - self.fade_counter, constants.SCREEN_HEIGHT))
+            # Top
+            pygame.draw.rect(screen, self.color, (0, 0, constants.SCREEN_WIDTH, (constants.SCREEN_HEIGHT // 2) - self.fade_counter))
+            # Bottom
+            pygame.draw.rect(screen, self.color, (0, (constants.SCREEN_HEIGHT // 2) + self.fade_counter, constants.SCREEN_WIDTH, (constants.SCREEN_HEIGHT // 2) - self.fade_counter))
+        if self.fade_counter >= constants.SCREEN_WIDTH:
+            fade_complete = True  # When the screen is fully revealed
+
+        return fade_complete
+
 
 
 #Damage text class
@@ -186,6 +214,9 @@ item_group.add(score_coin)
 
 for item in world.item_list:
     item_group.add(item)
+
+#create screen fade
+intro_fade = ScreenFade(1, constants.BLACK, 4)
 
 
 #create coin
@@ -287,7 +318,9 @@ while running:
         fireball.draw(screen)
 
     #check level completion
+
     if level_complete and level < 3:
+        start_intro = True
         level += 1
         MAP = reset_level()
         
@@ -312,6 +345,11 @@ while running:
         for item in world.item_list:
             item_group.add(item)
 
+    #show intro
+    if start_intro == True:
+        if intro_fade.fade():
+            start_intro = False
+            intro_fade.fade_counter = 0
 
     #event handler (pressing keys, quiting the game)
     for event in pygame.event.get():
