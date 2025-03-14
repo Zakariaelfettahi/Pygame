@@ -45,6 +45,9 @@ for i in range(4):
 #potion image
 potion_image = scale_image(pygame.image.load("assets/images/items/potion_red.png").convert_alpha(), constants.POTION_SCALER)
 
+item_images = []
+item_images.append(coin_images)
+item_images.append(potion_image)
 
 #heart images
 empty_heart_image = scale_image(pygame.image.load("assets/images/items/heart_empty.png").convert_alpha(), constants.ITEM_SCALER)
@@ -76,7 +79,7 @@ for mob in mob_types:
 
 #draw world
 world = World()
-world.process_data(constants.MAP, tile_list)
+world.process_data(constants.MAP, tile_list, item_images, mob_animations)
 # draw grid
 def draw_bg():
     for x in range(30):
@@ -132,10 +135,10 @@ class DamageText(pygame.sprite.Sprite):
 
 
 # create a player
-player = Character(100, 100, 100, mob_animations,0)
+player = world.player
 
-#create an enemy
-enemy = Character(200, 200, 100, mob_animations, 1)
+#enemy list
+enemy_list = world.character_list
 
 #create player's weapon
 bow = Weapon(bow_image, arrow_image)
@@ -149,6 +152,10 @@ item_group = pygame.sprite.Group()
 score_coin = Items(590, 19, 0, coin_images, True)
 item_group.add(score_coin)
 
+for item in world.item_list:
+    item_group.add(item)
+
+
 #create coin
 coin = Items(300, 300, 0, coin_images)
 item_group.add(coin)
@@ -156,11 +163,6 @@ item_group.add(coin)
 #create potion
 potion = Items(100, 200, 1, [potion_image]) #no need for fifth argument, init as false by defaut in items.py
 item_group.add(potion)
-
-
-#create enemy list
-enemy_list = []
-enemy_list.append(enemy)
 
 
 #main game loop
