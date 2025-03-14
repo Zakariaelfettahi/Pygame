@@ -1,4 +1,5 @@
 import pygame
+from pygame import mixer
 import constants
 from character import Character
 from weapon import Weapon
@@ -7,6 +8,7 @@ from world import World
 from button import Button
 import csv
 
+mixer.init()
 pygame.init()
 
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
@@ -32,6 +34,28 @@ move_left = False
 move_right = False
 move_up = False
 move_down = False
+
+#music and sounds
+pygame.mixer.music.load("assets/audio/music.wav")
+pygame.mixer_music.set_volume(0.2)
+pygame.mixer.music.play(-1, 0.0, 5000)
+
+#shot arrow
+shot_fx = pygame.mixer.Sound("assets/audio/arrow_shot.mp3")
+shot_fx.set_volume(0.5)
+
+#hit arrow
+hit_fx = pygame.mixer.Sound("assets/audio/arrow_hit.wav")
+hit_fx.set_volume(0.5)
+
+#coin fx
+coin_fx = pygame.mixer.Sound("assets/audio/coin.wav")
+coin_fx.set_volume(0.5)
+
+#heal fx
+heal_fx = pygame.mixer.Sound("assets/audio/heal.wav")
+heal_fx.set_volume(0.5)
+
 
 #scale image helper function
 def scale_image(image, scaler):
@@ -319,11 +343,13 @@ while running:
                 arrow = bow.update(player)
                 if arrow:
                     arrow_group.add(arrow)
+                    shot_fx.play()
                 
                 # Update arrow
                 for arrow in arrow_group:
                     damage, damage_position = arrow.update(screen_scroll, world.obstacle_tiles, enemy_list)
                     if damage:
+                        hit_fx.play()
                         damage_text = DamageText(damage_position[0], damage_position[1], str(damage), pygame.Color("red"))
                         damage_text_group.add(damage_text)
 
@@ -336,7 +362,7 @@ while running:
 
                 #draw and update items (NOT THIS)
                 item_group.draw(screen)
-                item_group.update(screen_scroll, player)
+                item_group.update(screen_scroll, player, coin_fx, heal_fx)
 
             #draw info
             draw_info()
@@ -369,7 +395,7 @@ while running:
                 level += 1
                 MAP = reset_level()
                 
-                with open(f"levels/level{constants.LEVEL}_data.csv", newline='') as csvfile:
+                with open(f"levels/level{level}_data.csv", newline='') as csvfile:
                     reader = csv.reader(csvfile, delimiter=',')
                     for x, row in enumerate(reader):
                         for y, tile in enumerate(row):
@@ -404,7 +430,7 @@ while running:
                         start_intro = True
                         MAP = reset_level()
                         
-                        with open(f"levels/level{constants.LEVEL}_data.csv", newline='') as csvfile:
+                        with open(f"levels/level{level}_data.csv", newline='') as csvfile:
                             reader = csv.reader(csvfile, delimiter=',')
                             for x, row in enumerate(reader):
                                 for y, tile in enumerate(row):

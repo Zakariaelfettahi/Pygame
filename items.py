@@ -12,7 +12,7 @@ class Items(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.dummy_coin = dummy_coin
 
-    def update(self, screen_scroll, player):
+    def update(self, screen_scroll, player, coin_fx, heal_fx):
         #dummy coin
         if not self.dummy_coin:
             #update rect
@@ -24,8 +24,10 @@ class Items(pygame.sprite.Sprite):
             #check item type
             if self.item_type == 0:
                 player.coins += 1
+                coin_fx.play()
             elif self.item_type == 1:
                 player.health += 20
+                heal_fx.play()
                 if player.health >= 100:
                     player.health = 100
             self.kill()
