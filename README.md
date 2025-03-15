@@ -1,7 +1,10 @@
 # Dungeon Crawler Game (Pygame)
 
+
 ## Overview
 This is a simple Dungeon Crawler game built using Pygame. The game was created by following a tutorial and serves as a learning project for game development with Python and Pygame.
+
+![Game Screenshot](screenshot.png)  
 
 ## Features
 - Basic player movement
